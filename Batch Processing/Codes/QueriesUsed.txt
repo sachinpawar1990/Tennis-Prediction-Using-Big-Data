@@ -1,0 +1,23 @@
+########## Importing from MySQL to HDFS through SQOOP ##########################
+sqoop import --connect jdbc:mysql://localhost/sachin --username training --password training --table tennisData --target-dir /tennis/tennisData --null-non-string '\\N' -m 1
+
+########## Deleting the NULL records from MySQL ################################
+delete from tennisData where tourney_id="";
+
+########## Truncate table if needed ##########################################
+truncate table tennisData;
+
+########## Update table converting date data type from string to Date ########
+update `tennisData` set `tourney_date`=str_to_date(`tourney_date`,'%Y-%m%d');
+
+########## Alter table by adding more columns for day, month and Year ########
+alter table tennisData add tourney_day int(5) after tourney_date;
+alter table tennisData add tourney_month int(5) after tourney_day;
+alter table tennisData add tourney_year int(5) after tourney_month;
+update tennisData set tourney_day=day(tourney_date);
+update tennisData set tourney_month=month(tourney_date);
+update tennisData set tourney_year=year(tourney_date);
+
+########## Execute a SQL file on MySQL Console ###############################
+source /home/training/Desktop/Tennis_Data/Load_data.sql;
+source /home/training/Desktop/create_table_2.txt;
